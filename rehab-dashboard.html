@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rehab and Training Plan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+button{cursor:pointer;font-family:inherit}
+a{text-decoration:none;color:inherit}
+#hdr{background:#1e293b;padding:14px 16px 10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+#hdr .row{display:flex;align-items:baseline;justify-content:space-between;max-width:640px;margin:0 auto}
+#hdr h1{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.3px}
+#hdr .sub{color:#94a3b8;font-size:12px}
+#prog-row{display:flex;align-items:center;gap:12px;margin:8px auto 6px;max-width:640px}
+#prog-bar{flex:1;height:6px;background:#475569;border-radius:99px;overflow:hidden}
+#prog-fill{height:100%;background:#34d399;border-radius:99px;transition:width .4s}
+#prog-label{color:#94a3b8;font-size:12px;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+#tabs{display:flex;gap:4px;max-width:640px;margin:0 auto}
+.tab{flex:1;padding:8px 2px;border:none;border-radius:8px;background:transparent;color:#94a3b8;font-size:13px;font-weight:600}
+.tab.on{background:#334155;color:#fff}
+#content{padding:14px 16px 60px;max-width:640px;margin:0 auto}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.card-pad{padding:14px 16px}
+.card h3{font-size:15px;font-weight:700}
+.muted{color:#64748b;font-size:12px;line-height:1.55}
+.chips{display:flex;gap:6px;margin-bottom:12px}
+.chip{flex:1;border:1px solid #e2e8f0;background:#fff;border-radius:12px;padding:7px 0;text-align:center;font-size:12px;font-weight:700;color:#475569;position:relative}
+.chip small{display:block;font-weight:500;font-size:10px;color:#94a3b8}
+.chip.sel{background:#1e293b;color:#fff;border-color:#1e293b}
+.chip.sel small{color:#cbd5e1}
+.chip.today::after{content:"";position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:#10b981}
+.phase{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1e3a8a;line-height:1.55}
+.phase strong{font-weight:700}
+.sec-hdr{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #e2e8f0}
+.sec-title{font-size:14px;font-weight:700}
+.sec-min{font-size:12px;font-weight:600;white-space:nowrap}
+.sec-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.ex-row{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-top:1px solid #f1f5f9}
+.ex-row:first-of-type{border-top:none}
+.ex-row.done{background:#f8fafc}
+.chk{flex-shrink:0;margin-top:2px;width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;display:flex;align-items:center;justify-content:center}
+.chk.checked{background:#10b981;border-color:#10b981}
+.chk svg{display:none}
+.chk.checked svg{display:block}
+.ex-main{flex:1;cursor:pointer;min-width:0}
+.ex-name{font-size:14px;font-weight:600;line-height:1.3}
+.ex-row.done .ex-name{color:#94a3b8;text-decoration:line-through}
+.ex-rx{font-size:12px;color:#94a3b8;margin-top:2px}
+.ex-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.chev{flex-shrink:0;margin-top:5px;color:#cbd5e1;transition:transform .2s;cursor:pointer}
+.chev.open{transform:rotate(180deg)}
+.ex-panel{display:none;padding:0 16px 16px 50px;border-top:1px solid #f8fafc}
+.ex-panel.open{display:block}
+.ex-inst{font-size:14px;color:#475569;line-height:1.6;margin-top:10px}
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:12px;color:#92400e;line-height:1.5}
+.timer-block{background:#f8fafc;border-radius:12px;padding:12px;margin-top:10px}
+.timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.timer-label{font-size:11px;color:#94a3b8}
+.timer-display{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#cbd5e1}
+.timer-display.active{color:#1e293b}
+.timer-display.done{color:#10b981}
+.timer-done-txt{font-size:11px;color:#10b981;font-weight:600}
+.timer-btns{display:flex;gap:8px}
+.timer-reset{font-size:12px;padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569}
+.timer-go{font-size:13px;padding:6px 16px;border-radius:8px;border:none;font-weight:600;color:#fff;background:#1e293b}
+.timer-go.paused{background:#475569}
+.timer-go.finished{background:#10b981}
+.prog-strip{height:5px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.prog-strip-fill{height:100%;background:#475569;border-radius:99px;transition:width 1s linear}
+.prog-strip-fill.done{background:#10b981}
+.vid-link{display:inline-flex;align-items:center;gap:6px;color:#ef4444;font-size:13px;font-weight:600;margin-top:12px}
+.note{font-size:13px;color:#475569;line-height:1.6;padding:12px 16px}
+.feel{display:flex;gap:6px;padding:0 16px 14px}
+.feel button{flex:1;padding:8px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:12px;font-weight:600;color:#475569}
+.feel button.f-good{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.feel button.f-nig{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.feel button.f-fl{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.toggle-line{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;font-weight:600;border-top:1px solid #f1f5f9;cursor:pointer}
+.bar-row{margin-bottom:12px}
+.bar-top{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px}
+.bar-top span:last-child{font-variant-numeric:tabular-nums;color:#64748b;font-weight:500}
+.bar{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.daycard{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid #f1f5f9;cursor:pointer}
+.daycard:first-of-type{border-top:none}
+.daycard .dn{width:44px;font-weight:700;font-size:14px}
+.daycard .dn small{display:block;font-size:10px;color:#94a3b8;font-weight:500}
+.daycard .dm{flex:1;font-size:13px;line-height:1.45}
+.daycard .dm small{display:block;color:#64748b;font-size:12px}
+.daycard .dp{font-size:12px;font-weight:700;color:#64748b;font-variant-numeric:tabular-nums}
+.weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.weeknav button{border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:600}
+.weeknav div{font-size:13px;font-weight:700}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid #f1f5f9;font-size:13px}
+.field:first-child{border-top:none}
+.field select,.field input[type=date],.field textarea{font:inherit;font-size:13px;border:1px solid #cbd5e1;border-radius:8px;padding:6px 8px;background:#fff}
+.field textarea{width:100%;min-height:60px}
+.btn{background:#1e293b;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700}
+.btn.sec{background:#fff;color:#475569;border:1px solid #cbd5e1}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid #f1f5f9;vertical-align:top}
+th{color:#64748b;font-weight:600;border-top:none}
+ul.clean{padding-left:18px;font-size:13px;line-height:1.7;color:#475569}
+.red{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.red h3{color:#991b1b}
+.amber{background:#fffbeb;border:1px solid #fde68a}
+.amber h3{color:#78350f}
+.link{color:#2563eb;font-weight:600}
+.open-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:13px;line-height:1.5;border-top:1px solid #f1f5f9;cursor:pointer}
+.open-item:first-of-type{border-top:none}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <div class="row"><h1>Rehab and Training Plan</h1><span class="sub" id="hdr-date"></span></div>
+  <div id="prog-row"><div id="prog-bar"><div id="prog-fill" style="width:0%"></div></div><div id="prog-label">0/0</div></div>
+  <div id="tabs"></div>
+</div>
+<div id="content"></div>
+
+<script>
+/* ---------- Goals ---------- */
+const GOALS={
+  arm:{label:"Biceps and shoulders",bg:"#fef3c7",fg:"#92400e",bar:"#f59e0b"},
+  back:{label:"Lower back",bg:"#d1fae5",fg:"#065f46",bar:"#10b981"},
+  knee:{label:"Left knee",bg:"#dbeafe",fg:"#1d4ed8",bar:"#3b82f6"},
+  mob:{label:"Mobility",bg:"#ede9fe",fg:"#6d28d9",bar:"#8b5cf6"},
+  surf:{label:"Surf fitness",bg:"#ccfbf1",fg:"#0f766e",bar:"#14b8a6"}
+};
+const GKEYS=["arm","back","knee","mob","surf"];
+
+/* ---------- Exercise library ---------- */
+const YT="https://www.youtube.com/watch?v=";
+const EX={
+ "bic-iso":{n:"Biceps isometric hold (palm up)",rx:"3 x 30 sec · right arm",m:2,g:["arm"],t:30,v:YT+"XGaa-Y9kWXs",
+  i:"Elbow bent to about 90 degrees, palm facing up, shoulder blade settled down and back. Press the palm up into your other hand or a fixed surface and hold steady with no movement. This is the 30 second biceps hold from Dr Olds's plan. Check your clinic handout for the exact set-up; the video shows the general technique.",
+  w:"Pain up to 4 to 5 out of 10 is acceptable only if it settles within a few hours and is gone by the next day. If it lingers, halve the effort next time."},
+ "er-hold":{n:"Side-lying external rotation hold",rx:"3 x 30 sec right · 1 x 30 sec left · 1 kg",m:2,g:["arm"],t:30,v:YT+"viiMqDpwqJ8",
+  i:"Lie on your side with the elbow bent to 90 degrees, holding a 1 kg weight. Rotate the forearm up toward the ceiling to mid range and hold it there, elbow tucked and top shoulder blade down. From Dr Olds's plan (30 second holds, 1 kg). Follow your clinic handout for the exact arm position; the video shows the standard version.",w:null},
+ "wall-flex":{n:"Wall isometric shoulder flexion hold",rx:"30 to 100 sec · each arm",m:1,g:["arm"],t:45,v:YT+"WCec1F7KfBI",
+  i:"Stand facing a wall with your fist or forearm on it at about shoulder height. Press forward into the wall without shrugging and hold. Dr Olds asked for 30 to 100 seconds daily. Start at 30 and build.",w:null},
+ "sleeper":{n:"Sleeper stretch (back of shoulder)",rx:"1 x 30 sec · each side",m:1,g:["arm"],t:30,v:YT+"h4cDJvpqMUg",
+  i:"Lie on your side with the lower arm bent 90 degrees in front of you. Use the top hand to gently press the wrist toward the floor, keeping the shoulder blade back. Prescribed to open the back of the shoulder, mainly on the right.",
+  w:"A firm stretch, not a pinch. Stop if the front of the shoulder pinches."},
+ "sup-curl":{n:"Slow biceps curl (palm up, light)",rx:"2 x 8 · 3 to 4 sec lower · right arm first",m:3,g:["arm"],v:YT+"Gmv2W7A_wZ4",
+  i:"Very light dumbbell. Use the other hand to help lift if needed, then lower slowly over 3 to 4 seconds with the palm up and the shoulder blade controlled. Dr Olds's plan is to load the biceps in the palm-up position. The video shows a neutral grip; turn the palm up as comfort allows. Add weight by no more than 10 percent a week.",
+  w:"Pain above 4 to 5 out of 10, or pain that lasts into the next day, means step back one level. Thursday's back and biceps session also loads this tendon, so keep this light."},
+ "sup-pron":{n:"Forearm rotation (palm up and palm down)",rx:"2 x 10 each way · slow",m:2,g:["arm"],v:YT+"3TDs93BzEj0",
+  i:"Elbow bent to 90 degrees and pinned to your side. Light dumbbell or band. Rotate the palm up, hold 3 seconds, then palm down, hold 3 seconds. Pain-free range only.",
+  w:"Carried over from your earlier program. Dr Olds wondered about weakness in palm-up rotation, so tell Dr Winstanley how this feels."},
+ "clam":{n:"Banded clamshell",rx:"2 x 12 · each side",m:2.5,g:["knee"],v:YT+"kO2Me7E83DQ",
+  i:"Band just above the knees. Lie on your side with hips stacked and knees bent 90 degrees. Lift the top knee without letting the hips roll back. Feel it in the outer hip, not the front.",w:null},
+ "habd":{n:"Side-lying hip abduction",rx:"2 x 12 · each side",m:2,g:["knee"],v:YT+"9dJVwNzbH7s",
+  i:"Same start as the clamshell but the top leg is straight. Lift it upward with the toes pointing slightly down. Slow and controlled both ways. This targets the gluteus medius, the muscle on the outer hip.",w:null},
+ "stpd":{n:"Step-down (slow lowering)",rx:"2 x 8 · each side · 3 to 4 sec lower",m:3,g:["knee"],v:YT+"rvI7OxBQqS4",
+  i:"Stand on a low step with the other leg hovering. Lower slowly over 3 to 4 seconds using only the standing leg. Knee tracks over the second toe with no inward collapse.",
+  w:"If the outer knee aches or swells afterwards, lower the step height next time."},
+ "mwlk":{n:"Monster walks (lateral)",rx:"2 x 15 steps · each direction",m:2.5,g:["knee"],v:YT+"rPTkrAJ6Fh4",
+  i:"Band around the ankles or just above the knees. Stay in a slight squat. Controlled lateral steps with constant band tension and level hips.",w:null},
+ "gbr":{n:"Glute bridge",rx:"2 x 12 · progress to single-leg",m:2.5,g:["knee"],v:YT+"7vTnfE6oiXk",
+  i:"Back flat, feet hip-width, heels close to the glutes. Drive the hips up, squeeze for 2 seconds, lower slowly. Progress to single-leg once the two-leg version feels easy.",w:null},
+ "rdl":{n:"Single-leg Romanian deadlift (light)",rx:"2 x 8 · each side",m:3,g:["knee"],v:YT+"Zfr6wizR8rs",
+  i:"Stand on the working leg with a slight knee bend. Hinge at the hip, pushing it back while the free leg extends behind you. Back flat, hips level. Bodyweight first, then a light dumbbell.",
+  w:"Use a neutral (palms facing in) grip on any dumbbell. Palm-up grips load the distal biceps tendon."},
+ "hth":{n:"Hip thrust",rx:"2 x 10",m:2.5,g:["knee"],v:YT+"29OfN4ztW_g",
+  i:"Upper back on the bench (or floor to start), dumbbell on the hips. Drive the hips to full extension, squeeze at the top, lower with control.",w:null},
+ "ssqt":{n:"Split squat (left side first)",rx:"2 x 8 · each side",m:3,g:["knee"],v:YT+"VPhhE6bBzZE",
+  i:"Rear foot flat or elevated. Front knee tracks over the second toe. Lower the rear knee slowly with an upright torso. Left leg first.",
+  w:"If the outer knee is irritable, shorten the range."},
+ "lbwk":{n:"Lateral band walks (quarter squat)",rx:"2 x 15 steps · each direction",m:2.5,g:["knee"],v:YT+"vExUfXBDCSw",
+  i:"Stay in a quarter squat throughout. Band above the knees or at the ankles. Toes forward, constant tension, hips level.",w:null},
+ "dquad":{n:"Quads stretch using chair",rx:"3 sets x 1 rep · 1 min hold",m:3,g:["back"],t:60,v:"https://au.physitrack.com/home-exercise-video/quads-stretch---stand",
+  i:"Daniel Harvey prescription. Stand beside a chair for balance. Bend one knee and hold the foot behind you, keeping the knees together and the lower back from arching. Hold 1 minute, then switch sides. 3 sets in total.",w:null},
+ "dhf":{n:"Hip flexor stretch (kneeling)",rx:"1 set x 3 reps · 1 min hold",m:3,g:["back"],t:60,v:YT+"iZ1eZBY4fwM",
+  i:"Daniel Harvey prescription. Kneel on one knee with the other foot forward. Tuck the tailbone under and gently shift forward until you feel the front of the back hip stretch. Hold 1 minute, 3 reps in total.",w:"Keep the lower back flat and do not let it arch."},
+ "dalt":{n:"Table top alternate LL lowering",rx:"2 sets x 10 reps",m:2,g:["back"],v:"https://au.physitrack.com/home-exercise-video/table-top-alternate-ll-lowering",
+  i:"Daniel Harvey prescription. LL means lower limb. Lie on your back with hips and knees at 90 degrees (table top). Keep the lower back still and slowly lower one foot toward the floor, return, then alternate legs.",w:"Keep the lower back steady. Reduce the range if it arches."},
+ "dbil":{n:"Table top bilateral LL extension",rx:"1 set x 10 reps · slide out to about 45 degrees",m:1.5,g:["back"],v:"https://au.physitrack.com/home-exercise-video/table-top-bilateral-ll-extension",
+  i:"Daniel Harvey prescription. From table top, slowly slide both legs out together to about 45 degrees, then bring them back. Keep the lower back still throughout.",w:"Only go as far as you can keep the lower back from arching."},
+ "dbird":{n:"Bird dog",rx:"2 sets x 10 reps",m:2.5,g:["back"],v:YT+"LrhCJc7-YxM",
+  i:"Daniel Harvey prescription. On all fours with a neutral spine. Extend the opposite arm and leg together, return with control, and alternate sides. Do not let the lower back arch or the hips rotate.",w:null},
+ "tfl-roll":{n:"Hip foam roll (front outer hip)",rx:"90 sec · each side",m:3,g:["knee"],t:90,v:YT+"E5tafgl76Uw",
+  i:"Lie slightly on your side with the roller under the front outer corner of the hip, just below the hip bone. Small movements, pause on tender spots.",
+  w:"Roll the hip only. Never roll the outer knee, which is where your bursitis is."},
+ "glute-roll":{n:"Glute foam roll",rx:"60 sec · each side",m:2,g:["knee"],t:60,v:YT+"E5tafgl76Uw",
+  i:"Sit on the roller, cross one ankle over the opposite knee and shift weight onto the working glute. Roll slowly and pause on tender spots.",w:null},
+ "hip-str":{n:"Hip flexor lunge stretch",rx:"60 sec · each side",m:2,g:["mob","knee"],t:60,v:YT+"iZ1eZBY4fwM",
+  i:"Half-kneeling. Tuck the pelvis under (tilt it back) before leaning forward, because that is what loads the hip flexor.",w:null},
+ "thor-ext":{n:"Thoracic extension over foam roller",rx:"6 slow reps · 10 sec each",m:2,g:["mob","surf"],v:YT+"9Y11Kc0E0og",
+  i:"Roller across the upper back, hands supporting the head. Gently lean back over the roller and pause, then move it up or down a segment. Keep the ribs down so the movement comes from the mid back, not the lower back.",
+  w:"Stay above the bottom of the ribs."},
+ "pec":{n:"Doorway pec stretch",rx:"2 x 30 sec · each side",m:2,g:["mob"],t:30,v:YT+"M850sCj9LHQ",
+  i:"Forearm on a doorframe at shoulder height, elbow at 90 degrees. Step one foot forward and gently lean the chest through the door. Opens the front of the shoulder after paddling.",w:null},
+ "s9090":{n:"90/90 hip sit",rx:"60 sec · each side",m:2,g:["mob"],t:60,v:YT+"t4Zz6-aG8Iw",
+  i:"Sit with both legs bent 90 degrees, front shin parallel in front and back shin behind. Sit tall and lean gently over the front shin. Works hip internal and external rotation, the range that was measured as limited on your left hip.",w:null},
+ "ham":{n:"Supine hamstring stretch (strap or band)",rx:"45 sec · each leg",m:1.5,g:["mob"],t:45,v:YT+"Il1L75v6gq0",
+  i:"Lie on your back with a strap or band looped around one foot. Raise the leg with a slight knee bend, then gently straighten it until you feel a firm stretch behind the thigh. Other leg stays flat. Dr Winstanley measured straight leg raise at about 50 degrees on both sides because of hamstring tightness.",
+  w:"Stop if you feel tingling or pain down the leg. Firm stretch only."},
+ "fig4":{n:"Figure-4 glute stretch",rx:"45 sec · each side",m:1.5,g:["mob","knee"],t:45,v:YT+"VgjgTGnBkx0",
+  i:"On your back, cross one ankle over the opposite knee. Draw both legs toward the chest until you feel a stretch deep in the outer glute. Breathe slowly.",w:null},
+ "calf":{n:"Calf stretch",rx:"45 sec · each side",m:2,g:["mob","knee"],t:45,v:YT+"wQyEC63Rea4",
+  i:"Against a wall. First with the back leg straight, then with a slight knee bend. Tight calves change walking mechanics and add load to the outer chain of the leg.",w:null},
+ "sliz":{n:"Lizard lunge with rotation",rx:"45 sec · each side",m:2,g:["mob","surf"],t:45,v:YT+"14rq7Gfm4aM",
+  i:"Step one foot forward outside the same-side hand and lower the back knee. Sink the hips, then rotate the torso open toward the front knee. Trains hip flexor range plus rotation, both needed for the pop-up.",
+  w:"Keep a neutral spine. Ease out of the rotation if the lower back complains."},
+ "sdsq":{n:"Deep squat hold",rx:"60 sec hold",m:1,g:["mob","surf"],t:60,v:YT+"0wzrgyAurT8",
+  i:"Feet shoulder-width, toes slightly out, squat as deep as you can with heels down. Hold a door frame if needed and gently pry the knees apart with the elbows. This is the bottom of the pop-up.",w:null},
+ "sobk":{n:"Open book (thoracic rotation)",rx:"8 reps each side · 3 sec hold",m:2,g:["mob","surf"],v:YT+"peeW19ofFUg",
+  i:"Lie on your side with hips and knees stacked at 90 degrees, arms out in front. Keep the bottom arm down and reach the top arm back toward the floor behind you, letting the chest open and the head follow.",
+  w:"Check with Daniel Harvey before doing this (spinal rotation). Keep the knees together; if you feel it in the lower back instead of the mid back, reduce the range."},
+ "scor":{n:"Scorpion stretch",rx:"6 reps each side · slow",m:2,g:["mob","surf"],v:YT+"x3wCR3As8fY",
+  i:"Lie face down with arms in a T. Lift one bent leg and rotate it slowly across the body toward the opposite hand, letting the hips follow, shoulders pressed into the floor.",
+  w:"Check with Daniel Harvey before doing this (spinal rotation). Move slowly and never force range. Stop if you feel sharp lower back pain."},
+ "thread":{n:"Thread the needle",rx:"8 reps each side",m:2,g:["mob"],v:YT+"ds3umIYJDrE",
+  i:"On all fours, slide one arm under the body and rotate the upper back, then reach it up toward the ceiling. Move through the mid back, not the lower back.",w:null},
+ "child":{n:"Child's pose",rx:"2 x 30 sec",m:1.5,g:["mob"],t:30,v:YT+"jaCOZJPSy2g",
+  i:"Knees wide, big toes touching, sit the hips back toward the heels with the arms extended forward. Breathe into the lower back.",w:null},
+ "catcow":{n:"Cat-cow",rx:"10 slow reps",m:1.5,g:["mob"],v:YT+"lD9ZDwlHmmE",
+  i:"On all fours, alternate between rounding and arching the spine in a slow, comfortable range. Breathe with the movement.",w:null},
+ "pigeon":{n:"Pigeon pose",rx:"2 x 30 sec · each side",m:3,g:["mob","knee"],t:30,v:YT+"FVlX5HNKamw",
+  i:"From all fours bring one knee forward behind the same-side wrist and extend the other leg straight back. Square the hips and fold gently over the front leg.",
+  w:"Skip it and use the figure-4 stretch if the knee or lower back objects."},
+ "prone-y":{n:"Prone Y raise (lower trapezius)",rx:"3 x 30 sec · 1 kg",m:3,g:["arm","surf"],t:30,v:YT+"JYf4vtyI8jQ",
+  i:"Lie face down with the arms in a Y and thumbs up. Lift the arms by drawing the shoulder blades down and together, and hold. Dr Olds prescribed this with 1 kg for 30 second sets. Lift only as high as the lower back stays quiet.",w:null},
+ "serr":{n:"Serratus plank (plank plus)",rx:"3 x 30 sec · on toes",m:2.5,g:["arm","surf"],t:30,v:YT+"R4aX4A1sW2w",
+  i:"Forearm or hands plank. Push the floor away so the upper back rounds slightly and the shoulder blades spread apart, then hold. From Dr Olds's plan (plank on toes, 30 second sets).",
+  w:"Drop to the knees if the lower back sags."},
+ "pullapart":{n:"Band pull-apart",rx:"3 x 15",m:2,g:["arm","surf"],v:YT+"2fmxGGtdbog",
+  i:"Hold a light band at chest height with straight arms and pull it apart by squeezing the shoulder blades together. Builds paddling endurance in the upper back.",w:null},
+ "rcer":{n:"Rotator cuff external rotation (band)",rx:"2 x 15 · each side",m:3,g:["arm","surf"],v:YT+"RaqAXvxbZIA",
+  i:"Elbow tucked at your side, rotate the forearm outward against a band or light dumbbell, then return slowly. Surfers tend to be strong in paddling muscles and weak in the rotators.",w:null},
+ "balance":{n:"Single-leg balance",rx:"2 x 30 sec · each leg",m:2,g:["knee","surf"],t:30,v:YT+"dyJal0rj8Go",
+  i:"Stand on one leg with a soft knee and level hips. Progress to eyes closed or turning the head side to side. Trains the stance control you need on a board.",w:null},
+ "spop":{n:"Pop-up practice (slow motion)",rx:"10 reps · focus on front foot position",m:3,g:["surf"],v:YT+"iHxLX1M7v2Q",
+  i:"Lie face down with hands beside the ribs. Push up slowly and bring the front foot as far forward as possible, landing in a low surf stance. 5 slow reps building range, then 5 at normal speed.",
+  w:"Keep the movement smooth. If the lower back is sore, stay with the slow version."},
+ "popfull":{n:"Pop-up at pace",rx:"3 x 5 · 30 sec rest",m:3,g:["surf"],v:YT+"dAqbb-UHRQ4",
+  i:"Lie face down and pop up in one movement to a surf stance with a soft landing and bent knees. Check front foot angle and back foot width.",
+  w:"Skip this version on any day the lower back feels sore."},
+ "cardio":{n:"Brisk-walk intervals (outdoors)",rx:"6 x (1 min fast + 90 sec easy)",m:12,g:["surf"],v:null,
+  i:"Walk easy for 2 minutes to warm up, then alternate 1 minute fast with 90 seconds easy. Fast means breathing hard but still able to speak in short phrases. Use a hill if you have one. No running while the lower back is being rebuilt. Build to 8 rounds over the 12 weeks.",
+  w:"If the left outer knee aches on downhill sections, use flat ground."}
+};
+
+/* ---------- Blocks ---------- */
+const BLOCKS={
+ holdsFull:{title:"Arm and shoulder holds",ex:["bic-iso","er-hold","wall-flex","sleeper"],type:"arm"},
+ holdsLight:{title:"Arm and shoulder holds (light)",ex:["er-hold","sleeper"],type:"arm",sub:"Thursday morning loads the biceps, so the biceps hold rests today."},
+ armLoad:{title:"Biceps loading",ex:["sup-curl","sup-pron"],type:"str"},
+ strS1:{title:"Strength A: glute medius and knee control",ex:["clam","habd","stpd","mwlk"],type:"str"},
+ strS2:{title:"Strength B: posterior chain and single-leg",ex:["gbr","rdl","hth"],type:"str"},
+ strS3:{title:"Strength C: split squat and band walks",ex:["ssqt","lbwk"],type:"str"},
+ backAM:{title:"Back rehab: morning set",ex:["dquad","dhf","dalt","dbil","dbird"],type:"back",sub:"Prescribed by Daniel Harvey (spinal physiotherapist). Do this set in the morning and again in the evening."},
+ backPM:{title:"Back rehab: evening set",ex:["dquad","dhf","dalt","dbil","dbird"],type:"back",sub:"Second round of Daniel Harvey's prescription for today."},
+ kneeThu:{title:"Knee soft tissue and hip stretch",ex:["tfl-roll","hip-str"],type:"mob"},
+ kneeSat:{title:"Knee soft tissue",ex:["tfl-roll"],type:"mob"},
+ mobMon:{title:"Mobility: thoracic and shoulder",ex:["thor-ext","pec"],type:"mob"},
+ mobTue:{title:"Mobility: hips and hamstrings",ex:["s9090","ham","fig4"],type:"mob"},
+ mobWed:{title:"Mobility: hamstrings and calves",ex:["ham","calf"],type:"mob"},
+ mobThu:{title:"Mobility: hips and deep squat",ex:["s9090","sliz","sdsq","fig4"],type:"mob"},
+ mobFri:{title:"Mobility: thoracic rotation",ex:["sobk","thread"],type:"mob"},
+ mobSat:{title:"Mobility: hips and spine",ex:["ham","s9090","child","catcow"],type:"mob"},
+ sunPop:{title:"Pop-up practice",ex:["spop:5"],type:"mob",add:["surf"]},
+ sunMob:{title:"Long mobility session",ex:["s9090","sliz","sdsq:1.5","pigeon","ham","fig4","hip-str","sobk","scor","thor-ext","pec","thread:1.5","child"],type:"mob"},
+ sAwarm:{title:"Warm-up",ex:["catcow","thread","sdsq:1.5"],add:["surf"],type:"am"},
+ sApaddle:{title:"Paddle strength and endurance",ex:["prone-y","serr","pullapart","rcer"],add:["surf"],type:"am"},
+ sAstance:{title:"Stance and trunk",ex:["balance","lbwk"],add:["surf"],type:"am"},
+ sAcardio:{title:"Low-impact intervals",ex:["cardio"],add:["surf"],type:"am"},
+ sApop:{title:"Pop-up",ex:["spop"],add:["surf"],type:"am"},
+ sBwarm:{title:"Warm-up",ex:["catcow","s9090","sdsq:1.5"],add:["surf"],type:"am"},
+ sBstance:{title:"Stance, balance and legs",ex:["ssqt:3.5","balance:2.5"],add:["surf"],type:"am"},
+ sBpaddle:{title:"Paddle endurance (lighter)",ex:["pullapart:2.5","prone-y:2.5"],add:["surf"],type:"am"},
+ sBpop:{title:"Pop-up",ex:["spop","popfull"],add:["surf"],type:"am"},
+ sBcardio:{title:"Low-impact intervals",ex:["cardio"],add:["surf"],type:"am"}
+};
+
+/* ---------- Weekly plan (0 = Monday) ---------- */
+const PLAN=[
+ {am:{type:"gym",title:"Chest and triceps",note:"Your program, unchanged. Shoulders and elbow carry the load today, so use the feel check afterwards."},
+  ev:["holdsFull","strS1","mobMon"]},
+ {am:{type:"gym",title:"Legs",note:"Your program, unchanged. If any lift loads the lower back or outer knee, watch how they feel over the next 24 hours and raise it with Dr Winstanley or Dan Harvey."},
+  ev:["holdsFull","armLoad","mobTue"]},
+ {am:{type:"surf",title:"Surf conditioning A: paddle and shoulder emphasis",blocks:["sAwarm","sApaddle","sAstance","sAcardio","sApop"],note:"Replaces your optional workout. About 38 minutes."},
+  ev:["holdsFull","strS2","mobWed"]},
+ {am:{type:"gym",title:"Back and biceps",note:"Your program, unchanged. This is the biggest elbow tendon load of the week. Earlier notes flagged pull-ups, rows, underhand pulldowns, hammer curls and deadlifts as aggravating, so watch the 24 hour response and raise it with Dr Winstanley."},
+  ev:["holdsLight","kneeThu","mobThu"]},
+ {am:{type:"gym",title:"Total body",note:"Your program, unchanged. A strength block follows this evening, so keep a little in reserve."},
+  ev:["holdsFull","strS3","mobFri"]},
+ {am:{type:"surf",title:"Surf conditioning B: stance, balance, legs and pop-up",blocks:["sBwarm","sBstance","sBpaddle","sBpop","sBcardio"],note:"Replaces your optional workout. About 38 minutes."},
+  ev:["holdsFull","kneeSat","mobSat"]},
+ {am:{type:"rest",title:"Rest day",note:"No gym. Do the long mobility session, arm holds and slow pop-up practice, ideally in one sitting."},
+  ev:["holdsFull","sunPop","sunMob"]}
+];
+PLAN.forEach(p=>{p.ev=["backPM"].concat(p.ev);});
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const FULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+/* ---------- Helpers ---------- */
+function uniq(a){return a.filter((x,i)=>a.indexOf(x)===i);}
+function exList(bid){
+  const b=BLOCKS[bid];
+  return b.ex.map(s=>{
+    const p=s.split(":");const e=EX[p[0]];
+    return Object.assign({},e,{id:p[0],m:p[1]?parseFloat(p[1]):e.m,key:bid+"|"+p[0],g:uniq(e.g.concat(b.add||[]))});
+  });
+}
+function bMin(bid){return exList(bid).reduce((a,e)=>a+e.m,0);}
+function amBlocks(i){return PLAN[i].am.blocks||[];}
+function bamBlocks(i){return ["backAM"];}
+function sid(k){return k.replace(/[^a-zA-Z0-9]/g,"_");}
+function fmtMin(m){return (Math.round(m*2)/2).toString().replace(".5",".5");}
+function fmtT(s){return s>=60?Math.floor(s/60)+":"+String(s%60).padStart(2,"0"):s+"s";}
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
+const TODAY=new Date();
+
+/* ---------- State ---------- */
+const KEY="rehab_v2_state";
+let S={done:{},feel:{},surfed:{},checkins:{},start:null,dan:null,open:{}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+if(!S.start){S.start=ymd(mondayOf(TODAY));save();}
+let weekOff=0,selDay=(TODAY.getDay()+6)%7,tab="today",openKey=null,tmr=null;
+function weekMon(){const m=mondayOf(TODAY);m.setDate(m.getDate()+7*weekOff);return m;}
+function dateOf(i){const m=weekMon();m.setDate(m.getDate()+i);return m;}
+function isDone(date,key){return !!(S.done[date]&&S.done[date][key]);}
+function setDone(date,key,v){if(!S.done[date])S.done[date]={};if(v)S.done[date][key]=1;else delete S.done[date][key];}
+
+/* what is visible on a given day, honouring "Surfed today" */
+function dayView(i){
+  const date=ymd(dateOf(i));const surfed=!!S.surfed[date];
+  const p=PLAN[i];
+  const am=surfed?[]:amBlocks(i);
+  let ev=p.ev;
+  if(surfed)ev=ev.filter(b=>["arm","mob","back"].indexOf(BLOCKS[b].type)>=0);
+  return {date:date,surfed:surfed,am:am,bam:bamBlocks(i),ev:ev,plan:p};
+}
+function dayKeys(i){
+  const v=dayView(i);const keys=[];
+  if(v.plan.am.type==="gym")keys.push("gym");
+  keys.push("abs");
+  v.am.concat(v.bam,v.ev).forEach(b=>exList(b).forEach(e=>keys.push(e.key)));
+  return keys;
+}
+function dayProgress(i){const v=dayView(i);const ks=dayKeys(i);const d=ks.filter(k=>isDone(v.date,k)).length;return {d:d,t:ks.length};}
+function evMin(i){return dayView(i).ev.reduce((a,b)=>a+bMin(b),0);}
+function goalTotals(){
+  const planned={arm:0,back:0,knee:0,mob:0,surf:0},done={arm:0,back:0,knee:0,mob:0,surf:0};
+  for(let i=0;i<7;i++){
+    const date=ymd(dateOf(i));
+    const blocks=amBlocks(i).concat(bamBlocks(i),PLAN[i].ev);
+    blocks.forEach(b=>exList(b).forEach(e=>{
+      e.g.forEach(g=>{planned[g]+=e.m;if(isDone(date,e.key))done[g]+=e.m;});
+    }));
+  }
+  return {planned:planned,done:done};
+}
+function plannedWeek(){return goalTotals().planned;}
+
+/* ---------- Icons ---------- */
+const CHEV='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
+const CHECK='<svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+const YTI='<svg width="18" height="18" viewBox="0 0 24 24" fill="#ef4444"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
+function tags(gs){return gs.map(g=>'<span class="tag" style="background:'+GOALS[g].bg+';color:'+GOALS[g].fg+'">'+GOALS[g].label+'</span>').join("");}
+
+/* ---------- Rows ---------- */
+function rowHTML(e,date){
+  const d=isDone(date,e.key),o=openKey===e.key;
+  const active=tmr&&tmr.key===e.key;
+  let timer="";
+  if(e.t){
+    const left=active?tmr.rem:e.t,fin=active&&tmr.rem===0;
+    const cls=active?(fin?"timer-display done":"timer-display active"):"timer-display";
+    const pct=active?(left/tmr.total*100):100;
+    const label=!active?"Start":(fin?"Done":(tmr.run?"Pause":"Resume"));
+    const bcls=fin?"timer-go finished":(active&&!tmr.run?"timer-go paused":"timer-go");
+    timer='<div class="timer-block"><div class="timer-row"><div><div class="timer-label">Timer</div><div class="'+cls+'" id="td-'+sid(e.key)+'">'+fmtT(left)+'</div>'+(fin?'<div class="timer-done-txt">Done. Switch sides</div>':'')+'</div><div class="timer-btns">'+(active?'<button class="timer-reset" onclick="rstT(\''+e.key+'\','+e.t+')">Reset</button>':'')+'<button class="'+bcls+'" onclick="hT(\''+e.key+'\','+e.t+')">'+label+'</button></div></div><div class="prog-strip"><div class="prog-strip-fill'+(fin?' done':'')+'" id="tp-'+sid(e.key)+'" style="width:'+pct+'%"></div></div></div>';
+  }
+  return '<div class="ex-row'+(d?' done':'')+'"><button class="chk'+(d?' checked':'')+'" onclick="tgl(\''+e.key+'\')" aria-label="Mark done">'+CHECK+'</button>'+
+   '<div class="ex-main" onclick="opn(\''+e.key+'\')"><div class="ex-name">'+e.n+'</div><div class="ex-rx">'+e.rx+' · '+fmtMin(e.m)+' min</div><div class="ex-tags">'+tags(e.g)+'</div></div>'+
+   '<div class="chev'+(o?' open':'')+'" onclick="opn(\''+e.key+'\')">'+CHEV+'</div></div>'+
+   '<div class="ex-panel'+(o?' open':'')+'"><p class="ex-inst">'+e.i+'</p>'+(e.w?'<div class="warn-box">'+e.w+'</div>':'')+timer+(e.v?'<a class="vid-link" href="'+e.v+'" target="_blank" rel="noopener noreferrer">'+YTI+' Watch tutorial</a>':'')+'</div>';
+}
+function blockHTML(bid,date,accent){
+  const b=BLOCKS[bid],ex=exList(bid),mins=ex.reduce((a,e)=>a+e.m,0);
+  const gs=uniq(ex.reduce((a,e)=>a.concat(e.g),[]));
+  return '<div class="card"><div class="sec-hdr" style="background:'+accent+'"><div><div class="sec-title">'+b.title+'</div><div class="sec-tags">'+tags(gs)+'</div></div><div class="sec-min">'+fmtMin(mins)+' min</div></div>'+(b.sub?'<div class="note" style="padding-bottom:4px;color:#92400e">'+b.sub+'</div>':'')+ex.map(e=>rowHTML(e,date)).join("")+'</div>';
+}
+function simpleRow(key,date,name,rx){
+  const d=isDone(date,key);
+  return '<div class="ex-row'+(d?' done':'')+'"><button class="chk'+(d?' checked':'')+'" onclick="tgl(\''+key+'\')" aria-label="Mark done">'+CHECK+'</button><div class="ex-main" onclick="tgl(\''+key+'\')"><div class="ex-name">'+name+'</div><div class="ex-rx">'+rx+'</div></div></div>';
+}
+
+/* ---------- Phase ---------- */
+function phaseInfo(){
+  const start=new Date(S.start+"T00:00:00");
+  const days=Math.floor((mondayOf(TODAY)-mondayOf(start))/86400000);
+  const wk=Math.floor(days/7)+1;
+  let name,txt;
+  if(wk<1){name="Not started";txt="Plan starts on "+S.start+".";}
+  else if(wk<=6){name="Foundation";txt="Weeks 1 to 6. 2 sets, clean form, pain-free or settling quickly. Do not add load faster than 10 percent a week.";}
+  else if(wk<=12){name="Build";txt="Weeks 7 to 12. Move strength blocks to 3 sets and add weight or range by no more than 10 percent a week if the 24 hour response stays good.";}
+  else{name="Review";txt="Past week 12. Time to review the whole plan with your clinicians before continuing.";}
+  return {wk:wk,name:name,txt:txt};
+}
+function danLine(){
+  if(!S.dan)return "Dan Harvey start date not set. Set it in Check-in so the 6 week review date can be worked out.";
+  const d=new Date(S.dan+"T00:00:00");d.setDate(d.getDate()+42);
+  return "Dr Winstanley's follow-up is due about "+ymd(d)+" (6 weeks after starting with Dan Harvey).";
+}
+
+/* ---------- Views ---------- */
+function renderToday(){
+  const v=dayView(selDay),p=v.plan,date=v.date;
+  const chips=DAYS.map((n,i)=>{const dt=dateOf(i);const cls="chip"+(i===selDay?" sel":"")+((weekOff===0&&i===(TODAY.getDay()+6)%7)?" today":"");return '<button class="'+cls+'" onclick="selD('+i+')">'+n+'<small>'+dt.getDate()+'</small></button>';}).join("");
+  const ph=phaseInfo();
+  let h='<div class="weeknav"><button onclick="wk(-1)">Prev</button><div>'+(weekOff===0?"This week":"Week of "+ymd(weekMon()))+'</div><button onclick="wk(1)">Next</button></div><div class="chips">'+chips+'</div>';
+  h+='<div class="phase"><strong>Week '+Math.max(ph.wk,1)+' · '+ph.name+'.</strong> '+ph.txt+'</div>';
+  h+='<h3 style="font-size:16px;margin:4px 2px 10px">'+FULL[selDay]+' · '+ymd(dateOf(selDay))+'</h3>';
+  /* morning */
+  if(p.am.type==="gym"){
+    const feel=S.feel[date]||"";
+    h+='<div class="card"><div class="sec-hdr" style="background:#f5f3ff"><div><div class="sec-title">Morning: '+p.am.title+'</div><div class="muted">40 to 60 min · your program</div></div></div>'+simpleRow("gym",date,"Regular session done","Per your program, not edited here")+'<div class="note">'+p.am.note+'</div>'+
+      '<div class="feel"><button class="'+(feel==="good"?"f-good":"")+'" onclick="fl(\'good\')">Felt fine</button><button class="'+(feel==="nig"?"f-nig":"")+'" onclick="fl(\'nig\')">Niggle</button><button class="'+(feel==="fl"?"f-fl":"")+'" onclick="fl(\'fl\')">Flared</button></div></div>';
+  } else if(p.am.type==="surf"){
+    if(v.surfed){
+      h+='<div class="card"><div class="sec-hdr" style="background:#f0fdfa"><div class="sec-title">Morning: surfed instead</div></div><div class="note">Surf session replaces today\'s conditioning. Strength and loading blocks are skipped this evening; arm holds and mobility stay.</div>'+surfToggle(date,true)+'</div>';
+    } else {
+      h+='<div class="card"><div class="sec-hdr" style="background:#f0fdfa"><div><div class="sec-title">Morning: '+p.am.title+'</div><div class="muted">Replaces your optional workout</div></div></div><div class="note">'+p.am.note+'</div>'+surfToggle(date,false)+'</div>';
+      v.am.forEach(b=>{h+=blockHTML(b,date,"#f0fdfa");});
+    }
+  } else {
+    h+='<div class="card"><div class="sec-hdr" style="background:#f8fafc"><div class="sec-title">Morning: '+p.am.title+'</div></div><div class="note">'+p.am.note+'</div>'+surfToggle(date,!!v.surfed)+'</div>';
+  }
+  if(p.am.type==="gym"){ /* allow a surf swap on gym days too? no: keep gym fixed */ }
+  /* morning back set */
+  h+='<h3 style="font-size:14px;margin:18px 2px 8px;color:#475569">Morning back set · about '+fmtMin(bMin('backAM'))+' min</h3>';
+  v.bam.forEach(b=>{h+=blockHTML(b,date,'#ecfdf5');});
+  /* abs */
+  h+='<div class="card"><div class="sec-hdr" style="background:#f8fafc"><div class="sec-title">Daily abs routine</div><div class="sec-min">5 min</div></div>'+simpleRow("abs",date,"Abs routine done","Per your program, not edited here")+'</div>';
+  /* evening */
+  const em=evMin(selDay);
+  h+='<h3 style="font-size:14px;margin:18px 2px 8px;color:#475569">Evening · about '+fmtMin(em)+' min</h3>';
+  v.ev.forEach(b=>{const t=BLOCKS[b].type;const acc=t==="arm"?"#fffbeb":(t==="mob"?"#f5f3ff":"#ecfdf5");h+=blockHTML(b,date,acc);});
+  document.getElementById("content").innerHTML=h;
+}
+function surfToggle(date,on){
+  return '<div class="toggle-line" onclick="srf()"><span class="chk'+(on?' checked':'')+'">'+CHECK+'</span>I surfed today (water session)</div>';
+}
+function renderWeek(){
+  const g=goalTotals();
+  let h='<div class="weeknav"><button onclick="wk(-1)">Prev</button><div>'+(weekOff===0?"This week":"Week of "+ymd(weekMon()))+'</div><button onclick="wk(1)">Next</button></div>';
+  h+='<div class="card card-pad"><h3 style="margin-bottom:10px">Minutes per goal</h3>';
+  GKEYS.forEach(k=>{
+    const pl=g.planned[k],dn=g.done[k],pct=pl?Math.min(100,Math.round(dn/pl*100)):0;
+    h+='<div class="bar-row"><div class="bar-top"><span>'+GOALS[k].label+'</span><span>'+fmtMin(dn)+' / '+fmtMin(pl)+' min</span></div><div class="bar"><i style="width:'+pct+'%;background:'+GOALS[k].bar+'"></i></div></div>';
+  });
+  let gym=0,abs=0,surfs=0;
+  for(let i=0;i<7;i++){const d=ymd(dateOf(i));if(PLAN[i].am.type==="gym"&&isDone(d,"gym"))gym++;if(isDone(d,"abs"))abs++;if(S.surfed[d])surfs++;}
+  h+='<div class="bar-row"><div class="bar-top"><span>Regular gym sessions</span><span>'+gym+' / 4</span></div><div class="bar"><i style="width:'+(gym/4*100)+'%;background:#8b5cf6"></i></div></div>';
+  h+='<div class="bar-row"><div class="bar-top"><span>Abs routine</span><span>'+abs+' / 7</span></div><div class="bar"><i style="width:'+(abs/7*100)+'%;background:#64748b"></i></div></div>';
+  h+='<div class="bar-row" style="margin-bottom:0"><div class="bar-top"><span>Surf sessions in the water</span><span>'+surfs+' (aiming for about 1 per fortnight)</span></div></div>';
+  h+='<p class="muted" style="margin-top:10px">Exercises that serve two goals count toward both, so the goal minutes add up to more than your real training time.</p></div>';
+  h+='<div class="card">';
+  for(let i=0;i<7;i++){
+    const v=dayView(i),pr=dayProgress(i),pc=Math.round(pr.d/pr.t*100);
+    const am=v.plan.am.type==="gym"?v.plan.am.title+" (your program)":(v.surfed?"Surfed":v.plan.am.title);
+    h+='<div class="daycard" onclick="goDay('+i+')"><div class="dn">'+DAYS[i]+'<small>'+dateOf(i).getDate()+'</small></div><div class="dm">'+am+'<small>Evening: '+fmtMin(evMin(i))+' min · '+v.ev.map(b=>BLOCKS[b].title.split(":")[0]).join(", ")+'</small></div><div class="dp">'+pc+'%</div></div>';
+  }
+  h+='</div>';
+  document.getElementById("content").innerHTML=h;
+}
+function renderGoals(){
+  const pl=plannedWeek();
+  const info={
+   arm:{what:"Right distal biceps tendon (where the biceps attaches near the elbow) and both shoulders.",how:"Short holds every evening (about 6 min), one loading block on Tuesday, and shoulder strength inside the Wednesday and Saturday surf sessions. Thursday evening keeps the biceps rested because your fixed session loads it.",src:"Dr Margie Olds, 7 Oct 2025: progressive tendon loading, 30 second holds, increase by no more than 10 percent a week. Dr Winstanley now oversees."},
+   back:{what:"Left-sided mechanical low back pain. MRI on 24 Jul 2026 showed mild disc changes at L4-5 and L5-S1 with no nerve compression.",how:"Daniel Harvey's five exercises, done twice a day, every day (a morning set and an evening set). Nothing else is counted toward the back, so the glute and hip strength blocks now count toward the knee only.",src:"Daniel Harvey (spinal physiotherapist) prescription. Dr Winstanley, 23 Jul and 7 Aug 2026: graded strengthening, not avoiding movement."},
+   knee:{what:"Left outer knee bursitis. Your working idea is that the iliotibial band, hip control, hamstrings and back may all be contributing.",how:"Hip and glute strength three times a week (Mon, Wed, Fri evenings), soft tissue work on the hip (never the knee), and hip and calf stretches.",src:"Your diagnosis. Hip abductor weakness has been linked to iliotibial band syndrome, but that is an association, not proven cause. Review at Dr Winstanley's follow-up."},
+   mob:{what:"Left hip rotation (internal rotation 10 degrees vs 20 on the right), hamstrings (straight leg raise about 50 degrees both sides), mid-back rotation, back of the shoulder, deep squat.",how:"Every evening plus a long Sunday session. Different focus each night so each area is hit 2 to 3 times a week.",src:"Dr Winstanley's examination 23 Jul 2026. Surfer's shoulder review recommends internal rotator stretching and thoracic extension."},
+   surf:{what:"Paddle endurance, stance control, pop-up mechanics and basic fitness without a pool, jump rope or running.",how:"Wednesday and Saturday mornings (about 38 min each) replace your optional workouts, plus slow pop-up practice on Sunday. Surf about once a fortnight, weather permitting.",src:"Systematic review of surfer's shoulder (2021): shoulder and lumbar spine have the highest rate of chronic injury in surfers."}
+  };
+  let h='';
+  GKEYS.forEach(k=>{
+    const x=info[k];
+    h+='<div class="card"><div class="sec-hdr" style="background:'+GOALS[k].bg+'"><div class="sec-title" style="color:'+GOALS[k].fg+'">'+GOALS[k].label+'</div><div class="sec-min" style="color:'+GOALS[k].fg+'">'+fmtMin(pl[k])+' min / week</div></div><div class="card-pad"><p class="muted"><strong>What:</strong> '+x.what+'</p><p class="muted" style="margin-top:6px"><strong>How:</strong> '+x.how+'</p><p class="muted" style="margin-top:6px"><strong>Source:</strong> '+x.src+'</p></div></div>';
+  });
+  h+='<div class="card"><div class="sec-hdr" style="background:#f5f3ff"><div class="sec-title">Regular workouts</div><div class="sec-min">4 sessions + daily abs</div></div><div class="card-pad"><p class="muted">Mon chest and triceps, Tue legs, Thu back and biceps, Fri total body, 40 to 60 min each, plus a 5 min abs routine every day. Your program is fixed and not edited here. Wednesday and Saturday optional workouts are now surf conditioning.</p></div></div>';
+  h+='<div class="card card-pad"><h3 style="margin-bottom:6px">Open items</h3><p class="muted" style="margin-bottom:6px">Tap to tick.</p>'+openItems()+'</div>';
+  document.getElementById("content").innerHTML=h;
+}
+const OPEN=[
+ ["dan","Ask Daniel Harvey whether the spinal rotation stretches (open book, scorpion) are OK for your back, and when to progress his exercises."],
+ ["winstanley","Book the Dr Winstanley follow-up (6 weeks after starting with Dan Harvey) and ask whether Tuesday and Thursday sessions need changes."],
+ ["teoh","See Dr Lawrence Teoh (rheumatology). Ask whether psoriasis and the positive HLA-B27 marker could explain problems at several sites (shoulders, elbow, knee, back). This is a question, not a diagnosis."],
+ ["chol","Return to your GP to review cholesterol with a fasting repeat test (Dr Winstanley's recommendation)."]
+];
+function openItems(){return OPEN.map(o=>'<div class="open-item" onclick="oi(\''+o[0]+'\')"><span class="chk'+(S.open[o[0]]?' checked':'')+'">'+CHECK+'</span><span>'+o[1]+'</span></div>').join("");}
+const SITES=[["arm","Right elbow and biceps"],["sh","Shoulders"],["back","Lower back"],["knee","Left knee (outer)"]];
+function renderCheckin(){
+  const mon=ymd(weekMon());const cur=S.checkins[mon]||{sites:{},note:""};
+  let h='<div class="card card-pad"><h3 style="margin-bottom:4px">Weekly check-in</h3><p class="muted">Week of '+mon+'. Rate how each area has been this week and whether it settled within 24 hours of training.</p><div style="margin-top:8px">';
+  SITES.forEach(s=>{
+    const c=cur.sites[s[0]]||{p:"",s:true};
+    let opts='<option value="">-</option>';for(let i=0;i<=10;i++)opts+='<option value="'+i+'"'+(String(c.p)===String(i)?' selected':'')+'>'+i+'</option>';
+    h+='<div class="field"><span>'+s[1]+'</span><span><select id="ci-p-'+s[0]+'">'+opts+'</select> <label style="font-size:12px"><input type="checkbox" id="ci-s-'+s[0]+'"'+(c.s!==false?' checked':'')+'> settled</label></span></div>';
+  });
+  h+='<div class="field"><textarea id="ci-note" placeholder="Notes (what flared, what helped)">'+(cur.note||"")+'</textarea></div></div><button class="btn" onclick="saveCI()">Save check-in</button></div>';
+  const keys=Object.keys(S.checkins).sort().reverse().slice(0,8);
+  h+='<div class="card card-pad"><h3 style="margin-bottom:8px">History (pain 0 to 10, ok = settled within 24 h)</h3>';
+  if(!keys.length)h+='<p class="muted">No check-ins yet.</p>';
+  else{h+='<table><tr><th>Week</th>'+SITES.map(s=>'<th>'+({arm:"Elbow",sh:"Shoulders",back:"Back",knee:"Knee"})[s[0]]+'</th>').join("")+'</tr>';
+    keys.forEach(k=>{const c=S.checkins[k];h+='<tr><td>'+k.slice(5)+'</td>'+SITES.map(s=>{const x=c.sites[s[0]];return '<td>'+(x&&x.p!==""?x.p+(x.s===false?" (no)":" ok"):"-")+'</td>';}).join("")+'</tr>';});
+    h+='</table>';}
+  h+='</div>';
+  /* session feel this week */
+  let good=0,nig=0,fl=0;for(let i=0;i<7;i++){const f=S.feel[ymd(dateOf(i))];if(f==="good")good++;else if(f==="nig")nig++;else if(f==="fl")fl++;}
+  h+='<div class="card card-pad"><h3 style="margin-bottom:6px">Gym session feel this week</h3><p class="muted">Fine: '+good+' · Niggle: '+nig+' · Flared: '+fl+'. Two or more flares in a week is worth raising with your clinicians.</p></div>';
+  h+='<div class="card card-pad"><h3 style="margin-bottom:6px">Plan dates</h3><div class="field"><span>Plan start (a Monday)</span><input type="date" id="st-start" value="'+S.start+'" onchange="setStart(this.value)"></div><div class="field"><span>Started with Dan Harvey</span><input type="date" id="st-dan" value="'+(S.dan||"")+'" onchange="setDan(this.value)"></div><p class="muted" style="margin-top:6px">'+danLine()+'</p></div>';
+  h+='<div class="card card-pad"><h3 style="margin-bottom:6px">Backup</h3><p class="muted">Ticks and check-ins live in this browser only. Use these buttons to copy or restore them.</p><div style="display:flex;gap:8px;margin-top:8px"><button class="btn sec" onclick="expo()">Copy data</button><button class="btn sec" onclick="impo()">Paste data</button></div></div>';
+  document.getElementById("content").innerHTML=h;
+}
+const ANAT=[
+ ["Distal biceps tendon","Where the biceps attaches to the radius bone at the front of the elbow, felt on the inner crease when you twist the forearm.","https://en.wikipedia.org/wiki/Biceps"],
+ ["Rotator cuff and shoulder blade","Four small muscles that hold the shoulder in its socket, plus the shoulder blade muscles that position it.","https://en.wikipedia.org/wiki/Rotator_cuff"],
+ ["Serratus anterior","Muscle along the ribs that holds the shoulder blade against the chest.","https://en.wikipedia.org/wiki/Serratus_anterior_muscle"],
+ ["Lumbar spine and discs (L4-5, L5-S1)","The five lower back vertebrae and the discs between them. Your MRI changes are at the bottom two levels, near the base of the spine.","https://en.wikipedia.org/wiki/Lumbar_vertebrae"],
+ ["Intervertebral disc","The cushion between each pair of vertebrae.","https://en.wikipedia.org/wiki/Intervertebral_disc"],
+ ["Gluteus medius","Muscle on the outer hip that steadies the pelvis when you stand on one leg.","https://en.wikipedia.org/wiki/Gluteus_medius"],
+ ["Iliotibial band","Thick band of tissue running down the outer thigh from the hip to just below the outer knee.","https://en.wikipedia.org/wiki/Iliotibial_tract"],
+ ["Knee and its bursae","Fluid-filled cushions around the knee. Yours is on the outer side.","https://en.wikipedia.org/wiki/Knee"],
+ ["Hamstrings","Muscles on the back of the thigh, from the sit bone to below the knee.","https://en.wikipedia.org/wiki/Hamstring"],
+ ["Hip joint","Ball and socket joint. Your left hip turns inward less than the right.","https://en.wikipedia.org/wiki/Hip"],
+ ["Thoracic spine","The 12 mid-back vertebrae attached to the ribs, which should supply most of your trunk rotation.","https://en.wikipedia.org/wiki/Thoracic_vertebrae"]
+];
+function renderSafety(){
+  let h='<div class="card card-pad amber"><h3 style="margin-bottom:6px">Pain rules</h3><ul class="clean"><li><strong>Tendons (biceps, shoulders):</strong> pain up to 4 to 5 out of 10 is acceptable if it settles within a few hours and is gone by the next day. Increase load or activity by no more than 10 percent a week. (Dr Olds, Oct 2025)</li><li><strong>Back:</strong> Dr Winstanley advises graded strengthening, because avoiding movement tends to backfire. Follow the advice from Daniel Harvey. During a flare, ease back to walking and gentle movement and keep the 24 hour response in the weekly check-in.</li><li><strong>Knee:</strong> never roll or press directly on the outer knee. If it becomes hot, red, much more swollen, or you cannot take weight on it, get it checked promptly.</li><li>If a block makes things worse two sessions in a row, drop it for a week and tell your clinicians.</li></ul></div>';
+  h+='<div class="card card-pad red"><h3 style="margin-bottom:6px">Get urgent medical help if</h3><ul class="clean" style="color:#991b1b"><li>You lose bladder or bowel control, or get numbness around the groin or saddle area</li><li>Leg weakness or numbness is spreading or getting worse</li><li>You have a fever with a hot, swollen joint</li></ul></div>';
+  h+='<div class="card"><div class="sec-hdr" style="background:#f8fafc"><div class="sec-title">Where things are</div></div><div style="padding:6px 16px 12px">'+ANAT.map(a=>'<div class="field" style="align-items:flex-start"><span><strong>'+a[0]+'</strong><br><span class="muted">'+a[1]+'</span></span><a class="link" href="'+a[2]+'" target="_blank" rel="noopener noreferrer">Diagram</a></div>').join("")+'</div></div>';
+  h+='<div class="card card-pad"><h3 style="margin-bottom:6px">Sources</h3><ul class="clean"><li>Dr Margie Olds, Auckland Shoulder Clinic assessment, 7 Oct 2025</li><li>Dr Colleen Winstanley, Axis Sports Medicine letters, 23 Jul and 7 Aug 2026, and MRI lumbar spine report, 24 Jul 2026</li><li><a class="link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7788157" target="_blank" rel="noopener noreferrer">The Surfer\'s Shoulder: A Systematic Review</a></li><li><a class="link" href="https://www.doi.org/10.1007/S40279-013-0019-Z" target="_blank" rel="noopener noreferrer">Malliaras et al., Achilles and patellar tendinopathy loading programmes</a></li><li><a class="link" href="https://profiles.wustl.edu/en/publications/hip-abductor-weakness-in-distance-runners-with-iliotibial-band-sy/" target="_blank" rel="noopener noreferrer">Fredericson et al., hip abductor weakness in runners with iliotibial band syndrome</a></li><li><a class="link" href="https://www.sportgeneeskunde.com/wp-content/uploads/ACSM-Position-Stand-Progression-Models-in-Resistance-Training-for-Healthy-Adults.pdf" target="_blank" rel="noopener noreferrer">American College of Sports Medicine position stand on resistance training</a></li></ul><p class="muted" style="margin-top:8px">This dashboard organises your clinicians\' advice. It does not replace it.</p></div>';
+  document.getElementById("content").innerHTML=h;
+}
+
+/* ---------- Chrome ---------- */
+const TABS=[["today","Today"],["week","Week"],["goals","Goals"],["checkin","Check-in"],["safety","Safety"]];
+function renderTabs(){document.getElementById("tabs").innerHTML=TABS.map(t=>'<button class="tab'+(tab===t[0]?' on':'')+'" onclick="go(\''+t[0]+'\')">'+t[1]+'</button>').join("");}
+function updateProgress(){
+  const pr=dayProgress(selDay);
+  document.getElementById("prog-fill").style.width=Math.round(pr.d/pr.t*100)+"%";
+  document.getElementById("prog-label").textContent=DAYS[selDay]+" "+pr.d+"/"+pr.t;
+}
+function render(){
+  renderTabs();
+  ({today:renderToday,week:renderWeek,goals:renderGoals,checkin:renderCheckin,safety:renderSafety})[tab]();
+  updateProgress();
+}
+
+/* ---------- Actions ---------- */
+function go(t){tab=t;window.scrollTo(0,0);render();}
+function selD(i){selDay=i;openKey=null;clearTimer();render();}
+function goDay(i){selDay=i;tab="today";openKey=null;window.scrollTo(0,0);render();}
+function wk(d){weekOff+=d;if(weekOff===0)selDay=(TODAY.getDay()+6)%7;openKey=null;clearTimer();render();}
+function tgl(key){const d=ymd(dateOf(selDay));setDone(d,key,!isDone(d,key));save();render();}
+function opn(key){openKey=openKey===key?null:key;render();}
+function fl(v){const d=ymd(dateOf(selDay));S.feel[d]=S.feel[d]===v?"":v;save();render();}
+function srf(){const d=ymd(dateOf(selDay));S.surfed[d]=!S.surfed[d];save();render();}
+function oi(k){S.open[k]=!S.open[k];save();render();}
+function saveCI(){
+  const mon=ymd(weekMon());const sites={};
+  SITES.forEach(s=>{sites[s[0]]={p:document.getElementById("ci-p-"+s[0]).value,s:document.getElementById("ci-s-"+s[0]).checked};});
+  S.checkins[mon]={sites:sites,note:document.getElementById("ci-note").value};save();render();
+}
+function setStart(v){if(v){S.start=v;save();}}
+function setDan(v){S.dan=v||null;save();render();}
+function expo(){const t=JSON.stringify(S);try{navigator.clipboard.writeText(t);alert("Copied.");}catch(e){prompt("Copy this:",t);}}
+function impo(){const t=prompt("Paste your saved data:");if(!t)return;try{S=Object.assign(S,JSON.parse(t));save();render();}catch(e){alert("That did not look like saved data.");}}
+
+/* ---------- Timer ---------- */
+function clearTimer(){if(tmr&&tmr.ivl)clearInterval(tmr.ivl);tmr=null;}
+function tick(){return setInterval(()=>{
+  if(!tmr)return;
+  if(tmr.rem<=0){clearInterval(tmr.ivl);tmr.run=false;uT();return;}
+  tmr.rem--;
+  if(tmr.rem===0){tmr.run=false;clearInterval(tmr.ivl);try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}}
+  uT();
+},1000);}
+function hT(key,total){
+  if(!tmr||tmr.key!==key){clearTimer();tmr={key:key,total:total,rem:total,run:true,ivl:null};tmr.ivl=tick();}
+  else if(tmr.rem===0){/* finished */}
+  else{tmr.run=!tmr.run;if(tmr.run)tmr.ivl=tick();else clearInterval(tmr.ivl);}
+  render();
+}
+function rstT(key,total){clearTimer();tmr={key:key,total:total,rem:total,run:false,ivl:null};render();}
+function uT(){
+  if(!tmr)return;
+  const td=document.getElementById("td-"+sid(tmr.key)),tp=document.getElementById("tp-"+sid(tmr.key));
+  if(td){td.textContent=fmtT(tmr.rem);td.className=tmr.rem===0?"timer-display done":"timer-display active";}
+  if(tp){tp.style.width=(tmr.rem/tmr.total*100)+"%";tp.className="prog-strip-fill"+(tmr.rem===0?" done":"");}
+  if(tmr.rem===0)render();
+}
+
+document.getElementById("hdr-date").textContent=TODAY.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+render();
+</script>
+</body>
+</html>

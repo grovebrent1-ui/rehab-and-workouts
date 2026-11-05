@@ -1,0 +1,17 @@
+{
+  "name": "Rehab & Workouts",
+  "short_name": "Rehab",
+  "description": "Rehab and training plan tracker",
+  "start_url": "./rehab-dashboard.html",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
